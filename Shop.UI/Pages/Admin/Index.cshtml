@@ -1,0 +1,23 @@
+﻿@page
+@model Shop.UI.Pages.Admin.IndexModel
+@{
+}
+
+<div id="app">
+
+    <input type="number" @@change="alert('alert me')" v-model="price" />
+    <button v-on:click="togglePrice">Toggle</button>
+    <p v-show="showPrice">
+        {{price}}
+    </p>
+    <p v-if="showPrice">
+        {{formatPrice}}
+    </p>
+
+</div>
+
+@section scripts {
+    <!-- production version, optimized for size and speed -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="~/admin/main.js"></script>
+}
