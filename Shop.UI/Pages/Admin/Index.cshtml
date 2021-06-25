@@ -4,20 +4,28 @@
 }
 
 <div id="app">
+    <button v-on:click="getProducts">Get Products</button>
+    <div>
+        <p v-for="(product, index) in products">
+            {{ product.id }} - {{ product.name }} - {{ product.description }}
+            <a @@click="editProduct(product, index)" href="javascript:void(0)">Edit</a>
+            <a @@click="deleteProduct(product.id, index)" href="javascript:void(0)">Remove</a>
+        </p>
+    </div>
 
-    <input type="number" @@change="alert('alert me')" v-model="price" />
-    <button v-on:click="togglePrice">Toggle</button>
-    <p v-show="showPrice">
-        {{price}}
-    </p>
-    <p v-if="showPrice">
-        {{formatPrice}}
-    </p>
+    <div>
+        <input v-model="productModel.name" />
+        <input v-model="productModel.description" />
+        <input v-model="valueCurrency" @@input="priceChanged" />
+        <button @@click="createProduct" v-if="!productModel.id">Create Product</button>
+        <button @@click="updateProduct" v-else>Update Product</button>
+    </div>
 
 </div>
 
 @section scripts {
     <!-- production version, optimized for size and speed -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-    <script src="~/admin/main.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="~/js/admin/main.js"></script>
 }

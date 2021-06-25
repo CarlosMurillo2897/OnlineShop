@@ -14,15 +14,21 @@ namespace Shop.Application.ProductsAdmin
             _context = context;
         }
 
-        public async Task Do(ProductViewModel vm)
+        public async Task<ProductViewModel> Do(ProductViewModel vm)
         {
-            _context.Products.Add(new Product {
+            var product = new Product
+            {
                 Name = vm.Name,
                 Description = vm.Description,
                 Value = Convert.ToDecimal(vm.Value)
-            });
+            };
+
+            _context.Products.Add(product);
 
             await _context.SaveChangesAsync();
+            vm.Id = product.Id;
+
+            return vm;
         }
     }
 }

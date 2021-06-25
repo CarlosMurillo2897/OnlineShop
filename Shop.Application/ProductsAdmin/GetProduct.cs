@@ -20,7 +20,7 @@ namespace Shop.Application.ProductsAdmin
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description,
-                Value = $"₡ {x.Value.ToString("N2")}", // 1100.50 => 1,100.50
+                Value = x.Value.ToString(), // toString('N2') = 1100.50 => 1,100.50
             }).FirstOrDefault();
     }
 }
