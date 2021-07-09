@@ -3,22 +3,26 @@
     data: {
         loading: false,
         objectIndex: 0,
-        valueCurrency: "₡ 1.99",
+        valueCurrency: '₡ 1.99',
+        languageFormat: 'en-US',
         productModel: {
             id: 0,
-            name: "Product Name",
-            description: "Product Description",
-            value: "1.99",
+            name: 'Product Name',
+            description: 'Product Description',
+            value: '1.99',
         },
         products: [],
+    },
+    mounted() {
+        this.getProducts();
     },
     methods: {
         getProduct(id) {
             this.loading = true;
-            axios.get('/Admin/product/' + id)
+            axios.get('/Admin/products/' + id)
                 .then(res => {
                     console.log(res);
-                    this.products = res.data;
+                    this.productModel = res.data;
                 })
                 .catch(err => {
                     console.log(err);
@@ -31,7 +35,6 @@
             this.loading = true;
             axios.get('/Admin/products')
                 .then(res => {
-                    console.log(res);
                     this.products = res.data;
                 })
                 .catch(err => {
@@ -70,14 +73,12 @@
                     this.loading = false;
                 });
         },
-        editProduct(product, index) {
+        editProduct(id, index) {
             this.objectIndex = index;
-            this.productModel = {
-                id: product.id,
-                name: product.name,
-                description: product.description,
-                value: product.value
-            }
+            this.getProduct(id);
+
+            this.valueCurrency = this.productModel.value;
+            this.priceChanged();
         },
         deleteProduct(id, index) {
             this.loading = true;
@@ -94,31 +95,46 @@
                 });
         },
         priceChanged() {
-            let newValue = this.valueCurrency.replace(/[^0-9\.]/g, '');
-            let hasDecimals = newValue.endsWith('.');
+            // Create common variables.
+            let whiteSpace = '';
+            let amountSymbol = '.';
+            let decimalSymbol = this.languageFormat === 'en-US' ? amountSymbol : ',';
 
-            let regex = RegExp(/\./g);
+            // Replace with blanks everything but numbers and dots. i.e.: RegEx = /[^0-9\.]/g
+            let newValue = this.valueCurrency.replace(
+                RegExp(`[^0-9\\${decimalSymbol}]`, 'g'), 
+                whiteSpace
+            );
+
+            // Check if amount has decimals and attach a decimalSymbol once input is converted.
+            let hasDecimals = newValue.endsWith(decimalSymbol);
+
+            // Check if there's more than one dot i.e.: 192.168.100.1
+            let regex = RegExp(`\\${decimalSymbol}`, 'g');
             if (newValue.match(regex)?.length > 1) {
+                // Replace all matches, but keep first one and others replace by a white space.
                 let counter = 0;
-                let placeHolder = '<holder>';
                 newValue = newValue.replace(
-                    regex, (_) => counter++ ? '' : placeHolder 
-                ).replace(
-                   placeHolder, '.'
+                    regex, (_) => counter++ ? whiteSpace : decimalSymbol
                 );
             }
 
-            if (newValue === '') {
-                newValue = '0';
-            }
-            
+            // In case validations or input set newValue as empty assign '0' as value.
+            newValue === whiteSpace ? newValue = '0' : null;
+
+            // In case decimalSymbol is a '.' amount will be splitted by ',' and the other way around.
+            decimalSymbol !== amountSymbol ? newValue = newValue.replace(decimalSymbol, amountSymbol) : null;
+
+            // Concatenate ₡ symbol + formatted amount + decimals if has.
+            this.valueCurrency = this.formatCurrency(newValue) + (hasDecimals ? decimalSymbol : whiteSpace);
             this.productModel.value = newValue;
-            this.valueCurrency = '₡ '
+        },
+        formatCurrency(value) {
+            return '₡ '
                 + new Intl.NumberFormat(
-                    'en-US',
+                    this.languageFormat,
                     { maximumFractionDigits: 2 }
-                ).format(newValue)
-                + (hasDecimals ? '.' : '');
+                ).format(value);
         }
     }
 });
