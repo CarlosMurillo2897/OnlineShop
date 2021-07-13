@@ -22,7 +22,7 @@ namespace Shop.UI
         {
             services.AddRazorPages(options =>
             {
-                options.Conventions.AddPageRoute("/Admin/Index", "");
+                // options.Conventions.AddPageRoute("/Admin/Index", "");
             });
             services.AddDbContext<ApplicationDbContext>(
                 options => options.UseSqlServer(Configuration["DefaultConnection"], b => b.MigrationsAssembly("Shop.Database"))

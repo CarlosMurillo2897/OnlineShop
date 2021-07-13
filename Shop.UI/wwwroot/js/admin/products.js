@@ -120,7 +120,7 @@
 
             // Replace with blanks everything but numbers and dots. i.e.: RegEx = /[^0-9\.]/g
             let newValue = this.valueCurrency.replace(
-                RegExp(`[^0-9\\${decimalSymbol}]`, 'g'), 
+                RegExp(`[^0-9\\${decimalSymbol}]`, 'g'),
                 whiteSpace
             );
 
