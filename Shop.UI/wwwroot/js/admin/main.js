@@ -1,6 +1,7 @@
 ﻿var app = new Vue({
     el: '#app',
     data: {
+        editing: false,
         loading: false,
         objectIndex: 0,
         valueCurrency: '₡ 1.99',
@@ -17,9 +18,9 @@
         this.getProducts();
     },
     methods: {
-        getProduct(id) {
+        async getProduct(id) {
             this.loading = true;
-            axios.get('/Admin/products/' + id)
+            await axios.get('/Admin/products/' + id)
                 .then(res => {
                     console.log(res);
                     this.productModel = res.data;
@@ -56,6 +57,7 @@
                 })
                 .then(() => {
                     this.loading = false;
+                    this.editing = false;
                 });
         },
         updateProduct() {
@@ -71,14 +73,17 @@
                 })
                 .then(() => {
                     this.loading = false;
+                    this.editing = false;
                 });
         },
-        editProduct(id, index) {
+        async editProduct(id, index) {
             this.objectIndex = index;
-            this.getProduct(id);
+            await this.getProduct(id);
 
             this.valueCurrency = this.productModel.value;
             this.priceChanged();
+
+            this.editing = true;
         },
         deleteProduct(id, index) {
             this.loading = true;
@@ -93,6 +98,19 @@
                 .then(() => {
                     this.loading = false;
                 });
+        },
+        cancel() {
+            this.editing = false;
+        },
+        newProduct() {
+            this.editing = true;
+            this.productModel = {
+                id: 0,
+                name: 'Product Name',
+                description: 'Product Description',
+                value: '₡ 1.99',
+            }
+            this.valueCurrency = this.productModel.value;
         },
         priceChanged() {
             // Create common variables.
@@ -124,9 +142,9 @@
 
             // In case decimalSymbol is a '.' amount will be splitted by ',' and the other way around.
             decimalSymbol !== amountSymbol ? newValue = newValue.replace(decimalSymbol, amountSymbol) : null;
-
             // Concatenate ₡ symbol + formatted amount + decimals if has.
             this.valueCurrency = this.formatCurrency(newValue) + (hasDecimals ? decimalSymbol : whiteSpace);
+            console.log(this.valueCurrency);
             this.productModel.value = newValue;
         },
         formatCurrency(value) {
