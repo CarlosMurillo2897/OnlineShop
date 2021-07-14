@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Shop.Application.StockAdmin
 {
-    class CreateStock
+    public class CreateStock
     {
         private ApplicationDbContext _ctx;
         public CreateStock(ApplicationDbContext ctx)
